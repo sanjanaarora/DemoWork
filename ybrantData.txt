@@ -1,0 +1,121 @@
+SELECT *,REPLACE(`daysType`,'(s)','s') as timeinterval FROM `studentcoursedetail` scd INNER JOIN courses c ON c.id=scd.courseid INNER JOIN batches b ON b.id=scd.batchid WHERE CURRENT_DATE=DATE_ADD(`dateOfJoining`, INTERVAL `days` ) 
+
+
+
+SELECT *,(REPLACE(`daysType`,'(s)','s')) as duration,DATE_ADD(`dateOfJoining`, INTERVAL `days` `daysType`)  FROM `studentcoursedetail` scd INNER JOIN courses c ON c.id=scd.courseid INNER JOIN batches b ON b.id=scd.batchid HAVING CURRENT_DATE=completionDate
+
+
+
+SELECT *,(REPLACE(`daysType`,'(s)','s')) as Duration,(SELECT DATE_ADD(`dateOfJoining`, INTERVAL `days` (REPLACE(`daysType`,'(s)','s'))) from studentcoursedetail)   FROM `studentcoursedetail` scd INNER JOIN courses c ON c.id=scd.courseid INNER JOIN batches b ON b.id=scd.batchid
+
+
+
+SELECT s.*,scd.*,b.batchtitle,c.coursename,concat( `days`,' ',(REPLACE(`daysType`,'(s)',''))) as Duration, DATE_ADD(`dateOfJoining`, INTERVAL concat( `days`,' ',(REPLACE(`daysType`,'(s)','')))) FROM `studentcoursedetail` scd INNER JOIN students s ON s.id=scd.studentid INNER JOIN batches b ON b.id=scd.batchid INNER JOIN courses c ON c.id=scd.courseid 
+
+
+
+  var tab = '<div class="table-responsive table-desi">' +
+                '<table class="table table-hover dynamictable">' +
+                '<thead>' +
+                '<tr>' +
+                '<th colspan="5"><input type="button" class="btn btn-info" onclick="sendSMS(\'\',' + batchid + ')"' +
+                '                                       value="Send SMS to All Students"></th>' +
+                '<td colspan="2"><b>Total Students</b></td>' +
+                '<td colspan="2">' + data.length + ' Student(s)</td>' +
+                '</tr>' +
+                '<tr>' +
+                ' <th><label for="checkAll">#</label></th>' +
+                '     <th>Student ID</th>' +
+                '     <th>Course Detail</th>' +
+                '     <th>Student name</th>' +
+                '     <th>Total Fees</th>' +
+                '     <th>Discount</th>' +
+                '     <th>Fee Recieved</th>' +
+                '     <th>Balance</th>' +
+                '     <th>Send SMS</th>' +
+                ' </tr>' +
+                ' </thead>' +
+                ' <tbody>';
+            var k = 0;
+            for (i = 0; i < data.length; i++) {
+                k++;
+                tab += '<tr';
+                if (data[i]['status'] == Inactive) {
+                    tab += 'class="bg-light"';
+                }
+                tab += '<td><label for="' + data[i]['studentid'] + '">' + k + '</label></td>' +
+                    '<td>' + data[i]['studentid'] + '</td>' +
+                    '<td>' +
+                    '                        <table>' +
+                    '                            <tr>' +
+                    '                                <th>Sr No.</th>' +
+                    '                                <th>Course Name</th>' +
+                    '                                <th>Batch Title</th>' +
+                    '                            </tr>';
+            }
+
+
+
+<?php
+
+use PhpOffice\PhpSpreadsheet\Helper\Sample;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
+require_once __DIR__ . '/vendor/phpoffice/phpspreadsheet/src/Bootstrap.php';
+include "../connection.php";
+$batchid = $_REQUEST['q'];
+$students = full_query("SELECT s.*,c.coursename,b.batchtitle FROM `students` s INNER JOIN studentcoursedetail scd ON s.id=scd.studentid  LEFT OUTER JOIN batches b on b.id=scd.batchid  LEFT OUTER JOIN courses c ON c.id=scd.courseid WHERE s.status='Active' and scd.batchid=" . $batchid);
+$batch = full_query("SELECT * FROM `batches` INNER JOIN courses ON courses.id=batches.course WHERE batches.id=" . $batchid);
+$helper = new Sample();
+if ($helper->isCli()) {
+    $helper->log('This example should only be run from a Web Browser' . PHP_EOL);
+
+    return;
+}
+// Create new Spreadsheet object
+$spreadsheet = new Spreadsheet();
+
+// Set document properties
+$spreadsheet->getProperties()->setCreator('Maarten Balliauw')
+    ->setLastModifiedBy('Maarten Balliauw')
+    ->setTitle('Office 2007 XLSX Test Document')
+    ->setSubject('Office 2007 XLSX Test Document')
+    ->setDescription('Test document for Office 2007 XLSX, generated using PHP classes.')
+    ->setKeywords('office 2007 openxml php')
+    ->setCategory('Test result file');
+
+// Add some data
+$spreadsheet->setActiveSheetIndex(0)
+    ->setCellValue('A1', 'Hello')
+    ->setCellValue('B2', 'world!')
+    ->setCellValue('C1', 'Hello')
+    ->setCellValue('D2', 'world!');
+
+
+// Rename worksheet
+$spreadsheet->getActiveSheet()->setTitle('Pending Fee of Students');
+
+// Set active sheet index to the first sheet, so Excel opens this as the first sheet
+$spreadsheet->setActiveSheetIndex(0);
+
+// Redirect output to a client’s web browser (Xlsx)
+header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+header('Content-Disposition: attachment;filename="Pending Fee of Students.xlsx"');
+header('Cache-Control: max-age=0');
+// If you're serving to IE 9, then the following may be needed
+header('Cache-Control: max-age=1');
+
+// If you're serving to IE over SSL, then the following may be needed
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT'); // always modified
+header('Cache-Control: cache, must-revalidate'); // HTTP/1.1
+header('Pragma: public'); // HTTP/1.0
+
+$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+//$writer->save('php://output');
+exit;
+
+
+
+SELECT s.*,c.coursename,b.batchtitle FROM `students` s INNER JOIN studentcoursedetail scd ON s.id=scd.studentid LEFT OUTER JOIN batches b on b.id=scd.batchid LEFT OUTER JOIN courses c ON c.id=scd.courseid WHERE scd.batchid=21 AND s.joiningDate BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL -7 Day)
