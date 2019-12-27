@@ -119,3 +119,7 @@ exit;
 
 
 SELECT s.*,c.coursename,b.batchtitle FROM `students` s INNER JOIN studentcoursedetail scd ON s.id=scd.studentid LEFT OUTER JOIN batches b on b.id=scd.batchid LEFT OUTER JOIN courses c ON c.id=scd.courseid WHERE scd.batchid=21 AND s.joiningDate BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL -7 Day)
+
+
+
+Hello Ybrant
